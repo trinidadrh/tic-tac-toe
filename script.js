@@ -1,7 +1,7 @@
-const a = [];
-
 // Constructs gameboard
 const gameBoard = (function(doc) {
+
+    let a = [];
 
     const tttArray = (() => {
         let b = " ";
@@ -27,6 +27,7 @@ const gameBoard = (function(doc) {
     })
 
     return {
+        a,
         tttArray,
         multipleBoxes,
     }
@@ -37,6 +38,8 @@ const gameBoard = (function(doc) {
 const displayController = (function(doc) { 
 
     let footer = document.getElementById("footer");
+    let playerX = prompt("Enter name for Player X:", "Firstname");
+    let playerO = prompt("Enter name for Player O:", "Firstname");
     let winner;
 
     // Activates gameboard and starts game with player X making first move
@@ -44,9 +47,12 @@ const displayController = (function(doc) {
         winner = "no";
         gameBoard.tttArray();
         gameBoard.multipleBoxes();
-        if (a === " ", " ", " ", " ", " ", " ", " ", " ", " ") {
+        playerX;
+        playerO;
+        if (gameBoard.a === " ", " ", " ", " ", " ", " ", " ", " ", " ") {
             addSymbol(".box", "X");
         } 
+        footer.innerHTML = "<b><i>" + playerX + "</i></b> select a square";
     }
 
     // Listens for box click; on click, changes gameboard array and box display; triggers next round
@@ -56,10 +62,10 @@ const displayController = (function(doc) {
         if (!!doc && "querySelector" in doc) {
             for (let i = 0; i <= 8; i++) {
                 box[i].addEventListener("click", function() {
-                    if (winner === "yes") {
+                    if ((winner === "yes") || (box[i].textContent === "X") || (box[i].textContent === "O")) {
                         return;
                     } else {
-                        a[i] = symbol;
+                        gameBoard.a[i] = symbol;
                         box[i].textContent = symbol;
                         playerDisplay(box[i], symbol);
                         console.log(symbol);
@@ -69,28 +75,28 @@ const displayController = (function(doc) {
                             winDeclared(symbol);
                             if (winner === "yes") {
                                 winDisplay(symbol);
-                                return a;
-                            } else if (a.includes(" ") === false) {
+                                return gameBoard.a;
+                            } else if (gameBoard.a.includes(" ") === false) {
                                 drawDisplay();
-                                return a;
+                                return gameBoard.a;
                             } else {
                                 symbol = "";
                                 addSymbol(".box", "O");
-                                return a;
+                                return gameBoard.a;
                             }
                         } else if (symbol === "O") {
                             console.log("play o");
                             winDeclared(symbol);
                             if (winner === "yes") {
                                 winDisplay(symbol);
-                                return a;
-                            } else if (a.includes(" ") === false) {
+                                return gameBoard.a;
+                            } else if (gameBoard.a.includes(" ") === false) {
                                 drawDisplay();
-                                return a;
+                                return gameBoard.a;
                             } else {
                                 symbol = "";
                                 addSymbol(".box", "X");
-                                return a;
+                                return gameBoard.a;
                             }
                         } else {
                             return;
@@ -105,10 +111,10 @@ const displayController = (function(doc) {
     const playerDisplay = (selector, mark) => {
         if (mark === "X") {
             selector.style.color = "deeppink";
-            footer.innerHTML = "<b><i>PLAYER O </i></b> select a square";
+            footer.innerHTML = "<b><i>" + playerO + "</i></b> select a square";
         } else if (mark === "O") {
             selector.style.color = "darkkhaki";
-            footer.innerHTML = "<b><i>PLAYER X </i></b> select a square";
+            footer.innerHTML = "<b><i>" + playerX + "</i></b> select a square";
         } 
     }
 
@@ -131,10 +137,26 @@ const displayController = (function(doc) {
 
     //Displays winner footer and prompts next round
     const winDisplay = (name) => {
-        footer.innerHTML = "<b><i>" + name + " wins!</i></b> Click here for a rematch.";
+        if (name === "X") {
+            footer.innerHTML = "<b><i>" + playerX + " wins!</i></b> Click here for a rematch.";
+        } else {
+            footer.innerHTML = "<b><i>" + playerO + " wins!</i></b> Click here for a rematch.";
+        }
         footer.addEventListener("click", function() {
+            document.querySelectorAll(".box").forEach(e => e.remove());
+            document.querySelectorAll(".new-game").forEach(e => e.remove());
+            gameBoard.a.splice(0, gameBoard.a.length)
+            startGame();
+        });
+
+        let newGame = doc.createElement("div");
+        newGame.className = "new-game";
+        newGame.textContent = "Switching players? Click here."
+        footer.after(newGame);
+        newGame.addEventListener("click", function() {
             location.reload();
         });
+
         return;
     }
 
@@ -142,8 +164,19 @@ const displayController = (function(doc) {
     const drawDisplay = () => {        
             footer.innerHTML = "<b><i>It's a DRAW!</i></b> Click here for a rematch.";
             footer.addEventListener("click", function() {
-                    location.reload();
-            })
+                document.querySelectorAll(".box").forEach(e => e.remove());
+                document.querySelectorAll(".new-game").forEach(e => e.remove());
+                gameBoard.a.splice(0, gameBoard.a.length)
+                startGame();            
+            });
+    
+            let newGame = doc.createElement("div");
+            newGame.className = "new-game";
+            newGame.textContent = "Switching players? Click here."
+            footer.after(newGame);
+            newGame.addEventListener("click", function() {
+                location.reload();
+            });
         return;
     }
     
